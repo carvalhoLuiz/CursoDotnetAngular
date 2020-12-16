@@ -1,5 +1,7 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { EventoService } from '../services/evento.service';
+import { Evento } from '../_models/Evento';
 
 
 @Component({
@@ -8,8 +10,23 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./eventos.component.scss']
 })
 export class EventosComponent implements OnInit {
+  eventosFiltrados: Evento[] = [];
+  eventos: Evento[] = [];
+  imagemLargura = 50;
+  imagemMargem = 2;
+  mostrarImagem = false;
+  modalRef: BsModalRef ;
 
   filtroLista =  '';
+
+  constructor(
+    private eventoService: EventoService,
+    private modalService: BsModalService
+    ) { }
+
+  ngOnInit(): void {
+    this.getEventos();
+  }
 
   get FiltroLista(): string {
     return this.filtroLista;
@@ -18,22 +35,13 @@ export class EventosComponent implements OnInit {
   set FiltroLista(value: string) {
     this.filtroLista = value;
     this.eventosFiltrados = this.filtroLista ? this.filtrarEventos(this.filtroLista) : this.eventos;
-
   }
 
-  eventos: any = [];
-  imagemLargura = 50;
-  imagemMargem = 2;
-  mostrarImagem = false;
-  eventosFiltrados: any = [];
-
-  constructor(private http: HttpClient ) { }
-
-  ngOnInit(): void {
-    this.getEventos();
+  openModal(template: TemplateRef<any>): void {
+    this.modalRef = this.modalService.show(template);
   }
 
-  filtrarEventos(filtrarPor: string): any {
+  filtrarEventos(filtrarPor: string): Evento[] {
     filtrarPor = filtrarPor.toLowerCase();
     return this.eventos.filter( (evento: any) => {
       console.log(evento.tema.toLowerCase().indexOf(filtrarPor));
@@ -46,13 +54,13 @@ export class EventosComponent implements OnInit {
   }
 
   getEventos(): void {
-   this.http.get('http://localhost:3001/api/values/').subscribe(response => {
-     this.eventos = response;
-     console.log(this.eventos);
+    this.eventoService.getAllEvento().subscribe(
+      (prEvento: Evento[]) => {
+      this.eventos =  prEvento;
+      this.eventosFiltrados = this.eventos;
+      console.log(prEvento);
     }, error => {
       console.log(error);
-    }
-    );
+    });
   }
-
 }
