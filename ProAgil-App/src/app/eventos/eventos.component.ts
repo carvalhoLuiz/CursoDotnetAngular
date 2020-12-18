@@ -1,8 +1,11 @@
 import { Component, OnInit, TemplateRef } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { EventoService } from '../services/evento.service';
 import { Evento } from '../_models/Evento';
-
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { BsLocaleService } from 'ngx-bootstrap/datepicker';
+import { ptBrLocale } from 'ngx-bootstrap/locale';
 
 @Component({
   selector: 'app-eventos',
@@ -12,19 +15,31 @@ import { Evento } from '../_models/Evento';
 export class EventosComponent implements OnInit {
   eventosFiltrados: Evento[] = [];
   eventos: Evento[] = [];
+
+  evento: Evento;
+  modoSalvar = 'post';
+  bodyDeletarEvento = '';
+
   imagemLargura = 50;
   imagemMargem = 2;
   mostrarImagem = false;
-  modalRef: BsModalRef ;
+  registerForm: FormGroup;
+
 
   filtroLista =  '';
 
   constructor(
     private eventoService: EventoService,
-    private modalService: BsModalService
-    ) { }
+    private modalService: BsModalService,
+    private fb: FormBuilder,
+    private localeService: BsLocaleService
+    ) {
+      defineLocale('pt-br', ptBrLocale);
+      this.localeService.use('pt-br');
+     }
 
   ngOnInit(): void {
+    this.validation();
     this.getEventos();
   }
 
@@ -37,20 +52,87 @@ export class EventosComponent implements OnInit {
     this.eventosFiltrados = this.filtroLista ? this.filtrarEventos(this.filtroLista) : this.eventos;
   }
 
-  openModal(template: TemplateRef<any>): void {
-    this.modalRef = this.modalService.show(template);
+  novoEvento(template: any): void {
+    this.modoSalvar = 'post';
+    this.openModal(template);
+  }
+  editarEvento(evento: Evento, template: any): void {
+    this.modoSalvar = 'put';
+    this.openModal(template);
+    this.evento = evento;
+    this.registerForm.patchValue(evento);
+  }
+  excluirEvento(evento: Evento, template: any) {
+    this.openModal(template);
+    this.evento = evento;
+    this.bodyDeletarEvento = `Tem certeza que deseja excluir o Evento: ${evento.tema}, Código: ${evento.tema}`;
+  }
+  confirmeDelete(template: any) {
+    this.eventoService.deleteEvento(this.evento.id).subscribe(
+      () => {
+          template.hide();
+          this.getEventos();
+        }, (error: any) => {
+          console.log(error);
+        }
+    );
+  }
+  openModal(template: any): void {
+    this.registerForm.reset();
+    template.show();
   }
 
   filtrarEventos(filtrarPor: string): Evento[] {
     filtrarPor = filtrarPor.toLowerCase();
     return this.eventos.filter( (evento: any) => {
-      console.log(evento.tema.toLowerCase().indexOf(filtrarPor));
-      return evento.tema.toLowerCase().indexOf(filtrarPor) !== -1;
+    return evento.tema.toLowerCase().indexOf(filtrarPor) !== -1;
     });
   }
 
   alterarImagem(): void{
     this.mostrarImagem = !this.mostrarImagem;
+  }
+
+  validation(): void {
+    this.registerForm = this.fb.group({
+      tema: ['',
+        [Validators.required, Validators.minLength(4), Validators.maxLength(50)]],
+      local: ['', Validators.required],
+      dataEvento: ['', Validators.required],
+      qtdPessoas: ['',
+        [Validators.required, Validators.maxLength(120000)]],
+      imgUrl: ['', Validators.required],
+      telefone: ['', Validators.required],
+      email: ['',
+        [Validators.required, Validators.email]],
+    });
+  }
+
+  salvarAlteracao(template: any): void {
+    if (this.registerForm.valid){
+      if (this.modoSalvar === 'post'){
+        this.evento = Object.assign({}, this.registerForm.value);
+        this.eventoService.postEvento(this.evento).subscribe(
+        (novoEvento: Evento) => {
+          template.hide();
+          this.getEventos();
+        }, (error: any) => {
+          console.log(error);
+        }
+      );
+      }
+      else {
+        this.evento = Object.assign({id: this.evento.id}, this.registerForm.value);
+        this.eventoService.putEvento(this.evento).subscribe(
+        () => {
+          template.hide();
+          this.getEventos();
+        }, (error: any) => {
+          console.log(error);
+        }
+      );
+      }
+}
   }
 
   getEventos(): void {
