@@ -5,6 +5,7 @@ obj
 obj/*
 .vscode
 .DS_Store
+api/proagil.webapi/resources/images/*
 
 # Angular
 dist

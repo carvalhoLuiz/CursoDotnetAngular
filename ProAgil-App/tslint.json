@@ -4,6 +4,7 @@
     "codelyzer"
   ],
   "rules": {
+    "no-angle-bracket-type-assertion": false,
     "align": {
       "options": [
         "parameters",
