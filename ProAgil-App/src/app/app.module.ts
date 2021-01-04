@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
@@ -20,8 +20,15 @@ import { DashboardComponent } from './dashboard/dashboard.component';
 import { ContatosComponent } from './contatos/contatos.component';
 import { PalestrantesComponent } from './palestrantes/palestrantes.component';
 import { TituloComponent } from './shared/titulo/titulo.component';
+import { LoginComponent } from './user/login/login.component';
+import { RegistrationComponent } from './user/registration/registration.component';
+import { UserComponent } from './user/user.component';
 
 import { DateTimeFormatPipePipe } from './helps/DateTimeFormatPipe.pipe';
+import { EventoService } from './services/evento.service';
+import { AuthInterceptor } from './auth/auth.interceptor';
+
+
 
 
 
@@ -30,11 +37,14 @@ import { DateTimeFormatPipePipe } from './helps/DateTimeFormatPipe.pipe';
     AppComponent,
       EventosComponent,
       NavComponent,
-      DateTimeFormatPipePipe,
       DashboardComponent,
       ContatosComponent,
       TituloComponent,
-      PalestrantesComponent
+      PalestrantesComponent,
+      UserComponent,
+      LoginComponent,
+      RegistrationComponent,
+      DateTimeFormatPipePipe
    ],
   imports: [
     BrowserModule,
@@ -53,7 +63,12 @@ import { DateTimeFormatPipePipe } from './helps/DateTimeFormatPipe.pipe';
     FormsModule,
     ReactiveFormsModule,
   ],
-  providers: [],
+  providers: [EventoService,
+  {
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthInterceptor,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

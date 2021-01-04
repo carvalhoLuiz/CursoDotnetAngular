@@ -69,6 +69,7 @@ namespace ProAgil.WebAPI.Controllers
 
 
         [HttpPost("Login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(UserLoginDTO userLogin)
         {
             try
