@@ -187,6 +187,7 @@ export class EventosComponent implements OnInit {
   }
 
   getEventos(): void {
+    this.dataAtual = new Date().getMilliseconds().toString();
     this.eventoService.getAllEvento().subscribe(
       (prEvento: Evento[]) => {
       this.eventos =  prEvento;
@@ -197,3 +198,5 @@ export class EventosComponent implements OnInit {
     });
   }
 }
+
+

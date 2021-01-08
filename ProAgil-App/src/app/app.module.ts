@@ -6,9 +6,10 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { ModalModule } from 'ngx-bootstrap/modal';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { TabsModule } from 'ngx-bootstrap/tabs';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { CommonModule } from '@angular/common';
 import { ToastrModule } from 'ngx-toastr';
+import { NgxMaskModule } from 'ngx-mask';
 
 
 import { AppRoutingModule } from './app-routing.module';
@@ -16,6 +17,7 @@ import { NavComponent } from './nav/nav.component';
 
 import { AppComponent } from './app.component';
 import { EventosComponent } from './eventos/eventos.component';
+import { EventoEditComponent } from './eventos/eventoEdit/eventoEdit.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ContatosComponent } from './contatos/contatos.component';
 import { PalestrantesComponent } from './palestrantes/palestrantes.component';
@@ -32,10 +34,12 @@ import { AuthInterceptor } from './auth/auth.interceptor';
 
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
       EventosComponent,
+      EventoEditComponent,
       NavComponent,
       DashboardComponent,
       ContatosComponent,
@@ -51,14 +55,16 @@ import { AuthInterceptor } from './auth/auth.interceptor';
     AppRoutingModule,
     BsDropdownModule.forRoot(),
     TooltipModule.forRoot(),
+    TabsModule.forRoot(),
     ModalModule.forRoot(),
+    NgxMaskModule.forRoot(),
     BsDatepickerModule.forRoot(),
     ToastrModule.forRoot({
       timeOut: 10000,
       positionClass: 'toast-bottom-right',
       preventDuplicates: true,
     }),
-    BrowserAnimationsModule,
+BrowserAnimationsModule,
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
